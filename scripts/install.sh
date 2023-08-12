@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Get the installation directory from environment variable or use default
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"

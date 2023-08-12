@@ -10,6 +10,8 @@ make
 
 ## Install
 
+NOTE: you will need `curl`, `bash`, and `jq` installed for the install script to work. It will attempt to install the binary in `/usr/local/bin` and will require `sudo` access. You can override the install directory by setting the `INSTALL_DIR` environment variable.
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/robertlestak/preflight-id/main/scripts/install.sh | bash
 ```
