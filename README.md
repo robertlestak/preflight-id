@@ -18,6 +18,20 @@ curl -sSL https://raw.githubusercontent.com/robertlestak/preflight-id/main/scrip
 
 ## Usage
 
+```bash
+Usage of preflight-id:
+  -aws-arn string
+        aws arn
+  -gcp-email string
+        gcp email
+  -kube-service-account string
+        kube service account
+  -log-level string
+        log level (default "info")
+  -provider string
+        provider. one of: aws, gcp, kube
+```
+
 ### AWS
 
 ```bash
