@@ -9,6 +9,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var (
+	Logger *log.Logger
+)
+
+func init() {
+	if Logger == nil {
+		Logger = log.New()
+		Logger.SetOutput(os.Stdout)
+		Logger.SetLevel(log.InfoLevel)
+	}
+}
+
 type IDProvider interface {
 	Run() error
 }
@@ -29,7 +41,7 @@ type PreflightID struct {
 }
 
 func LoadConfig(filepath string) (*PreflightID, error) {
-	l := log.WithFields(log.Fields{
+	l := Logger.WithFields(log.Fields{
 		"fn": "LoadConfig",
 	})
 	l.Debug("loading config")
@@ -50,20 +62,37 @@ func LoadConfig(filepath string) (*PreflightID, error) {
 	return pf, err
 }
 
+func NewPreflighter(provider Provider, config *PreflightID) (IDProvider, error) {
+	l := Logger.WithFields(log.Fields{
+		"fn":       "NewPreflighter",
+		"provider": provider,
+	})
+	l.Debug("creating preflighter")
+	switch provider {
+	case ProviderAWS:
+		return config.AWS, nil
+	case ProviderGCP:
+		return config.GCP, nil
+	case ProviderKube:
+		return config.Kube, nil
+	default:
+		return nil, errors.New("invalid provider")
+	}
+}
+
 func (p *PreflightID) Run() error {
-	l := log.WithFields(log.Fields{
-		"app": "preflight-id",
-		"fn":  "p.Run",
+	l := Logger.WithFields(log.Fields{
+		"preflight": "id",
 	})
 	l.Debug("running preflight-id")
-	switch p.Provider {
-	case ProviderAWS:
-		return p.AWS.Run()
-	case ProviderGCP:
-		return p.GCP.Run()
-	case ProviderKube:
-		return p.Kube.Run()
-	default:
-		return errors.New("invalid provider")
+	preflighter, err := NewPreflighter(p.Provider, p)
+	if err != nil {
+		l.WithError(err).Error("error creating preflighter")
+		return err
 	}
+	if err := preflighter.Run(); err != nil {
+		l.WithError(err).Error("error running preflighter")
+		return err
+	}
+	return nil
 }

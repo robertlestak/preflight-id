@@ -33,6 +33,7 @@ func main() {
 		ll = log.InfoLevel
 	}
 	log.SetLevel(ll)
+	preflightid.Logger = l.Logger
 	var provider string
 	if provider == "" {
 		// infer provider from flags

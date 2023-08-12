@@ -2,6 +2,7 @@ package preflightid
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
@@ -14,9 +15,8 @@ type IDProviderAWS struct {
 
 func (p *IDProviderAWS) Run() error {
 	l := log.WithFields(log.Fields{
-		"app":      "preflight-id",
-		"provider": "aws",
-		"fn":       "p.Run",
+		"preflight": "id",
+		"provider":  "aws",
 	})
 	l.Debug("running preflight-id")
 	if p.ARN == "" {
@@ -34,9 +34,10 @@ func (p *IDProviderAWS) Run() error {
 		return err
 	}
 	if *resp.Arn != p.ARN {
-		l.WithError(err).Errorf("ARN mismatch: %s != %s", *resp.Arn, p.ARN)
-		return errors.New("ARN mismatch")
+		failStr := fmt.Sprintf("failed - expected %s, got %s", p.ARN, *resp.Arn)
+		l.Error(failStr)
+		return errors.New(failStr)
 	}
-	l.Info("ARN match")
+	l.Info("passed")
 	return nil
 }

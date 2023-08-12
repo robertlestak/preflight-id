@@ -18,9 +18,8 @@ type IDProviderGCP struct {
 
 func (p *IDProviderGCP) Run() error {
 	l := log.WithFields(log.Fields{
-		"app":      "preflight-id",
-		"provider": "gcp",
-		"fn":       "p.Run",
+		"preflight": "id",
+		"provider":  "gcp",
 	})
 	l.Debug("running preflight-id")
 	if p.Email == "" {
@@ -40,9 +39,12 @@ func (p *IDProviderGCP) Run() error {
 		l.WithError(err).Error("Failed to retrieve authorized accounts")
 		return err
 	}
+	var accountList []string
 	for _, account := range response.Accounts {
+		accountList = append(accountList, account.Email)
 		if strings.EqualFold(account.Email, p.Email) {
 			l.Debugf("Service Account match: %s", account.Email)
+			l.Info("passed")
 			return nil
 		}
 	}
@@ -52,11 +54,14 @@ func (p *IDProviderGCP) Run() error {
 			l.WithError(err).Error("Failed to retrieve VM Identity")
 			return err
 		}
+		accountList = append(accountList, vmIdentity)
 		if strings.EqualFold(vmIdentity, p.Email) {
 			l.Debugf("VM Identity match: %s", vmIdentity)
+			l.Info("passed")
 			return nil
 		}
 	}
-	l.Errorf("Service Account not found: %s", p.Email)
-	return errors.New(fmt.Sprintf("Service Account not found"))
+	failStr := fmt.Sprintf("failed - expected %s, got %v", p.Email, accountList)
+	l.Error(failStr)
+	return errors.New(failStr)
 }

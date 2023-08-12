@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -16,9 +17,8 @@ type IDProviderKube struct {
 
 func (k *IDProviderKube) Run() error {
 	l := log.WithFields(log.Fields{
-		"app":      "preflight-id",
-		"provider": "kube",
-		"fn":       "k.Run",
+		"preflight": "id",
+		"provider":  "kube",
 	})
 	l.Debug("running preflight-id")
 	if k.ServiceAccount == "" {
@@ -58,12 +58,15 @@ func (k *IDProviderKube) Run() error {
 	serviceAccountName := claims.Kubernetes.ServiceAccount.Name
 	l.Debugf("service account name: %s", serviceAccountName)
 	if serviceAccountName == "" {
-		return errors.New("invalid JWT token claims")
+		failStr := "failed - no service account name in JWT token"
+		l.Error(failStr)
+		return errors.New(failStr)
 	}
 	if k.ServiceAccount != "" && k.ServiceAccount != serviceAccountName {
-		l.WithError(err).Errorf("service account name mismatch: %s != %s", k.ServiceAccount, serviceAccountName)
-		return errors.New("service account name mismatch")
+		failStr := fmt.Sprintf("failed - expected %s, got %s", k.ServiceAccount, serviceAccountName)
+		l.Error(failStr)
+		return errors.New(failStr)
 	}
-	l.Info("service account name match")
+	l.Info("passed")
 	return nil
 }
