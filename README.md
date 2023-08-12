@@ -28,8 +28,6 @@ Usage of preflight-id:
         kube service account
   -log-level string
         log level (default "info")
-  -provider string
-        provider. one of: aws, gcp, kube
 ```
 
 ### AWS

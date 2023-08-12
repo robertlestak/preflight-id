@@ -23,7 +23,6 @@ func main() {
 	l.Debug("starting preflight-id")
 	preflightFlags := flag.NewFlagSet("preflight-id", flag.ExitOnError)
 	logLevel := preflightFlags.String("log-level", log.GetLevel().String(), "log level")
-	provider := preflightFlags.String("provider", "", "provider. one of: aws, gcp, kube")
 	kubeServiceAccount := preflightFlags.String("kube-service-account", "", "kube service account")
 	awsArn := preflightFlags.String("aws-arn", "", "aws arn")
 	gcpEmail := preflightFlags.String("gcp-email", "", "gcp email")
@@ -33,20 +32,21 @@ func main() {
 		ll = log.InfoLevel
 	}
 	log.SetLevel(ll)
-	if *provider == "" {
+	var provider string
+	if provider == "" {
 		// infer provider from flags
 		if *kubeServiceAccount != "" {
-			*provider = "kube"
+			provider = "kube"
 		} else if *awsArn != "" {
-			*provider = "aws"
+			provider = "aws"
 		} else if *gcpEmail != "" {
-			*provider = "gcp"
+			provider = "gcp"
 		}
 	}
 	l.Debugf("log level: %s", ll)
-	l.Debugf("provider: %s", *provider)
+	l.Debugf("provider: %s", provider)
 	pf := &preflightid.PreflightID{
-		Provider: preflightid.Provider(*provider),
+		Provider: preflightid.Provider(provider),
 	}
 	switch pf.Provider {
 	case preflightid.ProviderAWS:
