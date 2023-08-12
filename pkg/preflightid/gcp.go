@@ -13,7 +13,7 @@ import (
 )
 
 type IDProviderGCP struct {
-	Email string `json:"email"`
+	Email string `json:"email" yaml:"email"`
 }
 
 func (p *IDProviderGCP) Run() error {

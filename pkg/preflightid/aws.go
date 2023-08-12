@@ -9,7 +9,7 @@ import (
 )
 
 type IDProviderAWS struct {
-	ARN string `json:"arn"`
+	ARN string `json:"arn" yaml:"arn"`
 }
 
 func (p *IDProviderAWS) Run() error {

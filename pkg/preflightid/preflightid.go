@@ -19,10 +19,10 @@ const (
 )
 
 type PreflightID struct {
-	Provider Provider        `json:"provider"`
-	AWS      *IDProviderAWS  `json:"aws"`
-	GCP      *IDProviderGCP  `json:"gcp"`
-	Kube     *IDProviderKube `json:"kube"`
+	Provider Provider        `json:"provider" yaml:"provider"`
+	AWS      *IDProviderAWS  `json:"aws" yaml:"aws"`
+	GCP      *IDProviderGCP  `json:"gcp" yaml:"gcp"`
+	Kube     *IDProviderKube `json:"kube" yaml:"kube"`
 }
 
 func (p *PreflightID) Run() error {

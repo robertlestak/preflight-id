@@ -11,7 +11,7 @@ import (
 )
 
 type IDProviderKube struct {
-	ServiceAccount string `json:"serviceAccount"`
+	ServiceAccount string `json:"serviceAccount" yaml:"serviceAccount"`
 }
 
 func (k *IDProviderKube) Run() error {
