@@ -53,6 +53,13 @@ preflight-id \
     -kube-service-account my-service-account
 ```
 
+### Docker example
+
+```bash
+docker run --rm robertlestak/preflight-id \
+    -aws-arn arn:aws:iam::123456789012:role/role-name
+```
+
 ## Config file
 
 You can also use a config file rather than cli args.
