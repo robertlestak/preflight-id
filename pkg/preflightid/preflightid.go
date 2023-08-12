@@ -80,11 +80,39 @@ func NewPreflighter(provider Provider, config *PreflightID) (IDProvider, error) 
 	}
 }
 
+func (p *PreflightID) InferProvider() error {
+	l := Logger.WithFields(log.Fields{
+		"fn": "InferProvider",
+	})
+	l.Debug("inferring provider")
+	var inferredProvider Provider
+	if p.Provider != "" {
+		l.Debug("provider already configured")
+		return nil
+	}
+	if p.AWS != nil {
+		inferredProvider = ProviderAWS
+	} else if p.GCP != nil {
+		inferredProvider = ProviderGCP
+	} else if p.Kube != nil {
+		inferredProvider = ProviderKube
+	}
+	if inferredProvider == "" {
+		return errors.New("unable to infer provider")
+	}
+	p.Provider = inferredProvider
+	return nil
+}
+
 func (p *PreflightID) Run() error {
 	l := Logger.WithFields(log.Fields{
 		"preflight": "id",
 	})
 	l.Debug("running preflight-id")
+	if err := p.InferProvider(); err != nil {
+		l.WithError(err).Error("error inferring provider")
+		return err
+	}
 	preflighter, err := NewPreflighter(p.Provider, p)
 	if err != nil {
 		l.WithError(err).Error("error creating preflighter")

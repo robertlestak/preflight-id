@@ -34,40 +34,27 @@ func main() {
 	}
 	log.SetLevel(ll)
 	preflightid.Logger = l.Logger
-	var provider string
-	if provider == "" {
-		// infer provider from flags
-		if *kubeServiceAccount != "" {
-			provider = "kube"
-		} else if *awsArn != "" {
-			provider = "aws"
-		} else if *gcpEmail != "" {
-			provider = "gcp"
-		}
-	}
 	l.Debugf("log level: %s", ll)
-	l.Debugf("provider: %s", provider)
-	pf := &preflightid.PreflightID{
-		Provider: preflightid.Provider(provider),
-	}
+	pf := &preflightid.PreflightID{}
 	if *configFile != "" {
 		if pf, err = preflightid.LoadConfig(*configFile); err != nil {
 			l.WithError(err).Error("error loading config")
 			os.Exit(1)
 		}
 	}
-	switch pf.Provider {
-	case preflightid.ProviderAWS:
+	if *kubeServiceAccount != "" {
+		pf.Kube = &preflightid.IDProviderKube{
+			ServiceAccount: *kubeServiceAccount,
+		}
+	}
+	if *awsArn != "" {
 		pf.AWS = &preflightid.IDProviderAWS{
 			ARN: *awsArn,
 		}
-	case preflightid.ProviderGCP:
+	}
+	if *gcpEmail != "" {
 		pf.GCP = &preflightid.IDProviderGCP{
 			Email: *gcpEmail,
-		}
-	case preflightid.ProviderKube:
-		pf.Kube = &preflightid.IDProviderKube{
-			ServiceAccount: *kubeServiceAccount,
 		}
 	}
 	if err := pf.Run(); err != nil {

@@ -66,21 +66,18 @@ You can also use a config file rather than cli args.
 
 ### aws
 ```yaml
-provider: aws
 aws:
       arn: arn:aws:iam::123456789012:role/role-name
 ```
 
 ### gcp
 ```yaml
-provider: gcp
 gcp:
       email: example@google.com
 ```
 
 ### kube
 ```yaml
-provider: kube
 kube:
       serviceAccount: my-service-account
 ```
