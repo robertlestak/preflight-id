@@ -22,6 +22,8 @@ curl -sSL https://raw.githubusercontent.com/robertlestak/preflight-id/main/scrip
 Usage of preflight-id:
   -aws-arn string
         aws arn
+  -config string
+        config file to use
   -gcp-email string
         gcp email
   -kube-service-account string
@@ -49,4 +51,33 @@ preflight-id \
 ```bash
 preflight-id \
     -kube-service-account my-service-account
+```
+
+## Config file
+
+You can also use a config file rather than cli args.
+
+### aws
+```yaml
+provider: aws
+aws:
+      arn: arn:aws:iam::123456789012:role/role-name
+```
+
+### gcp
+```yaml
+provider: gcp
+gcp:
+      email: example@google.com
+```
+
+### kube
+```yaml
+provider: kube
+kube:
+      serviceAccount: my-service-account
+```
+
+```bash
+preflight-id -config config.yaml
 ```

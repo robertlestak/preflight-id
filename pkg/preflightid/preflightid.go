@@ -1,9 +1,12 @@
 package preflightid
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
 
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 type IDProvider interface {
@@ -23,6 +26,28 @@ type PreflightID struct {
 	AWS      *IDProviderAWS  `json:"aws" yaml:"aws"`
 	GCP      *IDProviderGCP  `json:"gcp" yaml:"gcp"`
 	Kube     *IDProviderKube `json:"kube" yaml:"kube"`
+}
+
+func LoadConfig(filepath string) (*PreflightID, error) {
+	l := log.WithFields(log.Fields{
+		"fn": "LoadConfig",
+	})
+	l.Debug("loading config")
+	var err error
+	pf := &PreflightID{}
+	bd, err := os.ReadFile(filepath)
+	if err != nil {
+		l.WithError(err).Error("error reading file")
+		return pf, err
+	}
+	if err := yaml.Unmarshal(bd, pf); err != nil {
+		// try with json
+		if err := json.Unmarshal(bd, pf); err != nil {
+			l.WithError(err).Error("error unmarshalling config")
+			return pf, err
+		}
+	}
+	return pf, err
 }
 
 func (p *PreflightID) Run() error {

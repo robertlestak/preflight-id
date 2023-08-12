@@ -26,6 +26,7 @@ func main() {
 	kubeServiceAccount := preflightFlags.String("kube-service-account", "", "kube service account")
 	awsArn := preflightFlags.String("aws-arn", "", "aws arn")
 	gcpEmail := preflightFlags.String("gcp-email", "", "gcp email")
+	configFile := preflightFlags.String("config", "", "config file to use")
 	preflightFlags.Parse(os.Args[1:])
 	ll, err := log.ParseLevel(*logLevel)
 	if err != nil {
@@ -47,6 +48,12 @@ func main() {
 	l.Debugf("provider: %s", provider)
 	pf := &preflightid.PreflightID{
 		Provider: preflightid.Provider(provider),
+	}
+	if *configFile != "" {
+		if pf, err = preflightid.LoadConfig(*configFile); err != nil {
+			l.WithError(err).Error("error loading config")
+			os.Exit(1)
+		}
 	}
 	switch pf.Provider {
 	case preflightid.ProviderAWS:
