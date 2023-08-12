@@ -8,6 +8,12 @@ A preflight check to validate the expected identity is bound in the environment.
 make
 ```
 
+## Install
+
+```bash
+curl -sSL https://raw.githubusercontent.com/robertlestak/preflight-id/main/scripts/install.sh | bash
+```
+
 ## Usage
 
 ### AWS

@@ -7,6 +7,10 @@ INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 
+if [ "$ARCH" = "x86_64" ]; then
+    ARCH="amd64"
+fi
+
 # GitHub repository and release URL
 REPO_OWNER="robertlestak"
 REPO_NAME="preflight-id"
