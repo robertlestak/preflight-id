@@ -3,6 +3,7 @@ package preflightid
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
@@ -33,11 +34,25 @@ func (p *IDProviderAWS) Run() error {
 	if err != nil {
 		return err
 	}
-	if *resp.Arn != p.ARN {
-		failStr := fmt.Sprintf("failed - expected %s, got %s", p.ARN, *resp.Arn)
-		l.Error(failStr)
-		return errors.New(failStr)
+	if *resp.Arn == p.ARN {
+		// exact match
+		l.Info("passed")
+		return nil
 	}
-	l.Info("passed")
-	return nil
+	// check if we have an assumed role
+	// the resp.Arn will be in the format of
+	// arn:aws:sts::123456789012:assumed-role/role-name/role-session-name
+	if strings.Contains(*resp.Arn, "assumed-role/") {
+		// check if the ARN matches the assumed role ARN
+		roleName := strings.Split(strings.Split(*resp.Arn, "/")[1], "/")[0]
+		accountNumber := strings.Split(*resp.Arn, ":")[4]
+		assumedRoleARN := fmt.Sprintf("arn:aws:iam::%s:role/%s", accountNumber, roleName)
+		if assumedRoleARN == p.ARN {
+			l.Info("passed")
+			return nil
+		}
+	}
+	failStr := fmt.Sprintf("failed - expected %s, got %s", p.ARN, *resp.Arn)
+	l.Error(failStr)
+	return errors.New(failStr)
 }
