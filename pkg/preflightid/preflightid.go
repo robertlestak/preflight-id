@@ -119,6 +119,7 @@ func (p *PreflightID) Run() error {
 		l.WithError(err).Error("error creating preflighter")
 		return err
 	}
+	preflighter.Equivalent()
 	if err := preflighter.Run(); err != nil {
 		l.WithError(err).Error("error running preflighter")
 		return err

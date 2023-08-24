@@ -34,7 +34,6 @@ func (p *IDProviderAWS) Run() error {
 	if p.ARN == "" {
 		return errors.New("ARN not configured")
 	}
-	p.Equivalent()
 	// Create a new AWS session using environment credentials
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,

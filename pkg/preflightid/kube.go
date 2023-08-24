@@ -32,7 +32,6 @@ func (k *IDProviderKube) Run() error {
 	if k.ServiceAccount == "" {
 		return errors.New("service account name not configured")
 	}
-	k.Equivalent()
 	tokenFile := "/var/run/secrets/kubernetes.io/serviceaccount/token"
 	tokenBytes, err := os.ReadFile(tokenFile)
 	if err != nil {

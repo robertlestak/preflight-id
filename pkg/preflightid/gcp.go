@@ -34,7 +34,6 @@ func (p *IDProviderGCP) Run() error {
 	if p.Email == "" {
 		return errors.New("email not configured")
 	}
-	p.Equivalent()
 	// Initialize a GCP client with the appropriate credentials
 	ctx := context.Background()
 	client, err := iam.NewService(ctx, option.WithScopes(iam.CloudPlatformScope))
