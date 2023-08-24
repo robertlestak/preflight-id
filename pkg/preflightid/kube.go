@@ -15,8 +15,16 @@ type IDProviderKube struct {
 	ServiceAccount string `json:"serviceAccount" yaml:"serviceAccount"`
 }
 
+func (k *IDProviderKube) Equivalent() {
+	l := Logger
+	l.Debug("printing equivalent command")
+	cmd := `sh -c 'EXPECTED="%s"; TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); PAYLOAD=$(echo "$TOKEN" | cut -d. -f2); DECODED_PAYLOAD=$(echo "$PAYLOAD" | base64 -d 2>/dev/null); SERVICE_ACCOUNT=$(echo "$DECODED_PAYLOAD" | jq -r '.sub'); SERVICE_ACCOUNT_NAME=$(echo "$SERVICE_ACCOUNT" | cut -d: -f4); if [ "$SERVICE_ACCOUNT_NAME" != "$EXPECTED" ]; then echo "Service account $SERVICE_ACCOUNT_NAME does not match expected $EXPECTED"; exit 1; fi'`
+	cmd = fmt.Sprintf(cmd, k.ServiceAccount)
+	l.Infof("equivalent command: %s", cmd)
+}
+
 func (k *IDProviderKube) Run() error {
-	l := log.WithFields(log.Fields{
+	l := Logger.WithFields(log.Fields{
 		"preflight": "id",
 		"provider":  "kube",
 	})
@@ -24,6 +32,7 @@ func (k *IDProviderKube) Run() error {
 	if k.ServiceAccount == "" {
 		return errors.New("service account name not configured")
 	}
+	k.Equivalent()
 	tokenFile := "/var/run/secrets/kubernetes.io/serviceaccount/token"
 	tokenBytes, err := os.ReadFile(tokenFile)
 	if err != nil {

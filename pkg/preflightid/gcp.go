@@ -16,8 +16,17 @@ type IDProviderGCP struct {
 	Email string `json:"email" yaml:"email"`
 }
 
+func (p *IDProviderGCP) Equivalent() {
+	l := Logger
+	l.Debug("printing equivalent command")
+	cmd := `ID=$(gcloud auth list --filter=status:ACTIVE --format="value(account)");`
+	cmd += fmt.Sprintf(`if [ "$ID" != "%s" ]; then echo "ID $ID does not match expected %s"; exit 1; fi`, p.Email, p.Email)
+	cmd = fmt.Sprintf("sh -c '%s'", cmd)
+	l.Infof("equivalent command: %s", cmd)
+}
+
 func (p *IDProviderGCP) Run() error {
-	l := log.WithFields(log.Fields{
+	l := Logger.WithFields(log.Fields{
 		"preflight": "id",
 		"provider":  "gcp",
 	})
@@ -25,6 +34,7 @@ func (p *IDProviderGCP) Run() error {
 	if p.Email == "" {
 		return errors.New("email not configured")
 	}
+	p.Equivalent()
 	// Initialize a GCP client with the appropriate credentials
 	ctx := context.Background()
 	client, err := iam.NewService(ctx, option.WithScopes(iam.CloudPlatformScope))

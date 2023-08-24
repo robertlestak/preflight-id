@@ -23,6 +23,7 @@ func init() {
 
 type IDProvider interface {
 	Run() error
+	Equivalent()
 }
 
 type Provider string

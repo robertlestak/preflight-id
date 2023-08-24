@@ -14,8 +14,19 @@ type IDProviderAWS struct {
 	ARN string `json:"arn" yaml:"arn"`
 }
 
+func (p *IDProviderAWS) Equivalent() {
+	l := Logger
+	l.Debug("printing equivalent command")
+	cmd := `ID=$(aws sts get-caller-identity --query Arn --output text);`
+	// if it contains "assumed-role/" then it's an assumed role and we need to parse it
+	cmd += `if [[ $ID == *"assumed-role/"* ]]; then ROLE_NAME=$(echo $ID | cut -d/ -f2); ACCOUNT_NUMBER=$(echo $ID | cut -d: -f5); ARN="arn:aws:iam::$ACCOUNT_NUMBER:role/$ROLE_NAME"; else ARN=$ID; fi;`
+	cmd += fmt.Sprintf(`if [ "$ARN" != "%s" ]; then echo "ARN $ARN does not match expected %s"; exit 1; fi`, p.ARN, p.ARN)
+	cmd = fmt.Sprintf("sh -c '%s'", cmd)
+	l.Infof("equivalent command: %s", cmd)
+}
+
 func (p *IDProviderAWS) Run() error {
-	l := log.WithFields(log.Fields{
+	l := Logger.WithFields(log.Fields{
 		"preflight": "id",
 		"provider":  "aws",
 	})
@@ -23,6 +34,7 @@ func (p *IDProviderAWS) Run() error {
 	if p.ARN == "" {
 		return errors.New("ARN not configured")
 	}
+	p.Equivalent()
 	// Create a new AWS session using environment credentials
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
