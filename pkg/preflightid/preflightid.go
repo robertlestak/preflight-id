@@ -23,7 +23,6 @@ func init() {
 
 type IDProvider interface {
 	Run() error
-	RunEquiv() bool
 	Equivalent()
 }
 
@@ -106,6 +105,27 @@ func (p *PreflightID) InferProvider() error {
 	return nil
 }
 
+func (p *PreflightID) Equivalent() {
+	l := Logger.WithFields(log.Fields{
+		"preflight": "id",
+	})
+	l.Debug("printing equivalent command")
+	if err := p.InferProvider(); err != nil {
+		l.WithError(err).Error("error inferring provider")
+		return
+	}
+	preflighter, err := NewPreflighter(p.Provider, p)
+	if err != nil {
+		l.WithError(err).Error("error creating preflighter")
+		return
+	}
+	if preflighter == nil {
+		l.Error("preflighter is nil")
+		return
+	}
+	preflighter.Equivalent()
+}
+
 func (p *PreflightID) Run() error {
 	l := Logger.WithFields(log.Fields{
 		"preflight": "id",
@@ -123,10 +143,6 @@ func (p *PreflightID) Run() error {
 	if preflighter == nil {
 		l.Error("preflighter is nil")
 		return errors.New("preflighter is nil")
-	}
-	if preflighter.RunEquiv() {
-		preflighter.Equivalent()
-		return nil
 	}
 	if err := preflighter.Run(); err != nil {
 		l.WithError(err).Error("error running preflighter")

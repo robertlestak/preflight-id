@@ -13,11 +13,6 @@ import (
 
 type IDProviderKube struct {
 	ServiceAccount string `json:"serviceAccount" yaml:"serviceAccount"`
-	Equiv          bool   `json:"equiv" yaml:"equiv"`
-}
-
-func (k *IDProviderKube) RunEquiv() bool {
-	return k.Equiv
 }
 
 func (k *IDProviderKube) Equivalent() {

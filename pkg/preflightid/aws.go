@@ -11,12 +11,7 @@ import (
 )
 
 type IDProviderAWS struct {
-	ARN   string `json:"arn" yaml:"arn"`
-	Equiv bool   `json:"equiv" yaml:"equiv"`
-}
-
-func (p *IDProviderAWS) RunEquiv() bool {
-	return p.Equiv
+	ARN string `json:"arn" yaml:"arn"`
 }
 
 func (p *IDProviderAWS) Equivalent() {

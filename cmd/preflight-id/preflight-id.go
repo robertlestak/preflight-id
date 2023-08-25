@@ -46,20 +46,21 @@ func main() {
 	if *kubeServiceAccount != "" {
 		pf.Kube = &preflightid.IDProviderKube{
 			ServiceAccount: *kubeServiceAccount,
-			Equiv:          *equiv,
 		}
 	}
 	if *awsArn != "" {
 		pf.AWS = &preflightid.IDProviderAWS{
-			ARN:   *awsArn,
-			Equiv: *equiv,
+			ARN: *awsArn,
 		}
 	}
 	if *gcpEmail != "" {
 		pf.GCP = &preflightid.IDProviderGCP{
 			Email: *gcpEmail,
-			Equiv: *equiv,
 		}
+	}
+	if *equiv {
+		pf.Equivalent()
+		os.Exit(0)
 	}
 	if err := pf.Run(); err != nil {
 		l.Fatal(err)

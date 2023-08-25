@@ -14,11 +14,6 @@ import (
 
 type IDProviderGCP struct {
 	Email string `json:"email" yaml:"email"`
-	Equiv bool   `json:"equiv" yaml:"equiv"`
-}
-
-func (p *IDProviderGCP) RunEquiv() bool {
-	return p.Equiv
 }
 
 func (p *IDProviderGCP) Equivalent() {
