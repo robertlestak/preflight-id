@@ -27,6 +27,7 @@ func main() {
 	awsArn := preflightFlags.String("aws-arn", "", "aws arn")
 	gcpEmail := preflightFlags.String("gcp-email", "", "gcp email")
 	configFile := preflightFlags.String("config", "", "config file to use")
+	equiv := preflightFlags.Bool("equiv", false, "print equivalent command")
 	preflightFlags.Parse(os.Args[1:])
 	ll, err := log.ParseLevel(*logLevel)
 	if err != nil {
@@ -45,16 +46,19 @@ func main() {
 	if *kubeServiceAccount != "" {
 		pf.Kube = &preflightid.IDProviderKube{
 			ServiceAccount: *kubeServiceAccount,
+			Equiv:          *equiv,
 		}
 	}
 	if *awsArn != "" {
 		pf.AWS = &preflightid.IDProviderAWS{
-			ARN: *awsArn,
+			ARN:   *awsArn,
+			Equiv: *equiv,
 		}
 	}
 	if *gcpEmail != "" {
 		pf.GCP = &preflightid.IDProviderGCP{
 			Email: *gcpEmail,
+			Equiv: *equiv,
 		}
 	}
 	if err := pf.Run(); err != nil {

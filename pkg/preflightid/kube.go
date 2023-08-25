@@ -13,6 +13,11 @@ import (
 
 type IDProviderKube struct {
 	ServiceAccount string `json:"serviceAccount" yaml:"serviceAccount"`
+	Equiv          bool   `json:"equiv" yaml:"equiv"`
+}
+
+func (k *IDProviderKube) RunEquiv() bool {
+	return k.Equiv
 }
 
 func (k *IDProviderKube) Equivalent() {
@@ -20,7 +25,7 @@ func (k *IDProviderKube) Equivalent() {
 	l.Debug("printing equivalent command")
 	cmd := `sh -c 'EXPECTED="%s"; TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); PAYLOAD=$(echo "$TOKEN" | cut -d. -f2); DECODED_PAYLOAD=$(echo "$PAYLOAD" | base64 -d 2>/dev/null); SERVICE_ACCOUNT=$(echo "$DECODED_PAYLOAD" | jq -r '.sub'); SERVICE_ACCOUNT_NAME=$(echo "$SERVICE_ACCOUNT" | cut -d: -f4); if [ "$SERVICE_ACCOUNT_NAME" != "$EXPECTED" ]; then echo "Service account $SERVICE_ACCOUNT_NAME does not match expected $EXPECTED"; exit 1; fi'`
 	cmd = fmt.Sprintf(cmd, k.ServiceAccount)
-	l.Infof("equivalent command: %s", cmd)
+	fmt.Println(cmd)
 }
 
 func (k *IDProviderKube) Run() error {

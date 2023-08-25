@@ -11,7 +11,12 @@ import (
 )
 
 type IDProviderAWS struct {
-	ARN string `json:"arn" yaml:"arn"`
+	ARN   string `json:"arn" yaml:"arn"`
+	Equiv bool   `json:"equiv" yaml:"equiv"`
+}
+
+func (p *IDProviderAWS) RunEquiv() bool {
+	return p.Equiv
 }
 
 func (p *IDProviderAWS) Equivalent() {
@@ -22,7 +27,7 @@ func (p *IDProviderAWS) Equivalent() {
 	cmd += `if [[ $ID == *"assumed-role/"* ]]; then ROLE_NAME=$(echo $ID | cut -d/ -f2); ACCOUNT_NUMBER=$(echo $ID | cut -d: -f5); ARN="arn:aws:iam::$ACCOUNT_NUMBER:role/$ROLE_NAME"; else ARN=$ID; fi;`
 	cmd += fmt.Sprintf(`if [ "$ARN" != "%s" ]; then echo "ARN $ARN does not match expected %s"; exit 1; fi`, p.ARN, p.ARN)
 	cmd = fmt.Sprintf("sh -c '%s'", cmd)
-	l.Infof("equivalent command: %s", cmd)
+	fmt.Println(cmd)
 }
 
 func (p *IDProviderAWS) Run() error {

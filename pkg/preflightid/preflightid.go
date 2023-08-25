@@ -23,6 +23,7 @@ func init() {
 
 type IDProvider interface {
 	Run() error
+	RunEquiv() bool
 	Equivalent()
 }
 
@@ -119,7 +120,14 @@ func (p *PreflightID) Run() error {
 		l.WithError(err).Error("error creating preflighter")
 		return err
 	}
-	preflighter.Equivalent()
+	if preflighter == nil {
+		l.Error("preflighter is nil")
+		return errors.New("preflighter is nil")
+	}
+	if preflighter.RunEquiv() {
+		preflighter.Equivalent()
+		return nil
+	}
 	if err := preflighter.Run(); err != nil {
 		l.WithError(err).Error("error running preflighter")
 		return err
