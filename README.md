@@ -24,6 +24,8 @@ Usage of preflight-id:
         aws arn
   -config string
         config file to use
+  -equiv
+        print equivalent command
   -gcp-email string
         gcp email
   -kube-service-account string
